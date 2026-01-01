@@ -91,7 +91,7 @@ const plyOptions = [
   { name: "ZLC", weight: 7.56, price: 42 }
 ];
 
-const form = document.getElementById("itemForm");
+const itemForm = document.getElementById("itemForm");
 
 /* Blade Shape */
 form.innerHTML += `<label>Blade Shape:</label><br>`;
@@ -180,7 +180,7 @@ function calculate() {
 }
 
 /* EVENTS */
-form.addEventListener("change", calculate);
+itemForm.addEventListener("change", calculate);
 
 document.querySelectorAll('input[name="buildType"]').forEach(r => {
   r.addEventListener("change", () => {
