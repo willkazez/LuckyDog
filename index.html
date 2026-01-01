@@ -228,7 +228,51 @@ document.getElementById("orderForm").addEventListener("submit", async (e) => {
   }
 });
 </script>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXYZ123/exec"; // replace with your Web App URL
 
+document.getElementById("orderForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const orderData = {
+    name: document.getElementById("customerName").value,
+    email: document.getElementById("customerEmail").value,
+    address: document.getElementById("customerAddress").value,
+    totalCost: document.getElementById("summaryTotal").textContent,
+    totalWeight: document.getElementById("summaryWeight").textContent,
+    orderSummary: document.getElementById("summaryContent").innerText,
+    timestamp: new Date().toISOString()
+  };
+
+  const status = document.getElementById("orderStatus");
+  status.textContent = "Submitting order…";
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(orderData),
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) throw new Error("Network error");
+
+    status.textContent = "✅ Order submitted successfully!";
+    document.getElementById("orderForm").reset();
+  } catch (err) {
+    status.textContent = "❌ Error submitting order. Please try again.";
+    console.error(err);
+  }
+});
+</script>
+3️⃣ Confirm your HTML IDs
+Make sure your contact form HTML has these IDs exactly:
+<form id="orderForm">
+  <input type="text" id="customerName" required>
+  <input type="email" id="customerEmail" required>
+  <textarea id="customerAddress" required></textarea>
+</form>
+
+<p id="orderStatus"></p>
 </body>
 </html>
 <hr>
