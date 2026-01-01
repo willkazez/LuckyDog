@@ -195,3 +195,27 @@ calculate();
 
 </body>
 </html>
+<hr>
+
+<h2>Contact & Shipping Information</h2>
+
+<form id="orderForm">
+  <label>
+    Full Name:<br>
+    <input type="text" id="customerName" required>
+  </label><br><br>
+
+  <label>
+    Email Address:<br>
+    <input type="email" id="customerEmail" required>
+  </label><br><br>
+
+  <label>
+    Shipping Address:<br>
+    <textarea id="customerAddress" rows="4" required></textarea>
+  </label><br><br>
+
+  <button type="submit">Submit Order</button>
+</form>
+
+<p id="orderStatus" style="font-weight:bold;"></p>
