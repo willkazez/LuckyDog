@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Paddle Options and Pricing</title>
   <style>
-    body { font-family: Arial, sans-serif; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
     .container { display: flex; gap: 40px; align-items: flex-start; }
     .form-section { flex: 1; }
     .summary-panel {
@@ -15,13 +16,10 @@
       background: #f9f9f9;
     }
     .summary-line { font-size: 14px; margin-bottom: 6px; }
-    .summary-total {
-      font-weight: bold;
-      margin-top: 10px;
-      border-top: 1px solid #ccc;
-      padding-top: 10px;
-    }
+    .summary-total { font-weight: bold; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px; }
     .hidden { display: none; }
+    label { display: block; margin-top: 10px; }
+    button { margin-top: 15px; padding: 8px 12px; font-size: 16px; }
   </style>
 </head>
 <body>
@@ -29,7 +27,7 @@
 <h1>Paddle Options and Pricing</h1>
 
 <div class="container">
-
+  <!-- LEFT: Paddle Options -->
   <div class="form-section">
     <form id="itemForm"></form>
 
@@ -38,30 +36,37 @@
     <p>Total Weight: <span id="itemTotalWeight">—</span></p>
   </div>
 
+  <!-- RIGHT: Summary Panel -->
   <div class="summary-panel">
     <h3>Order Summary</h3>
     <div id="summaryContent"></div>
-
     <div class="summary-total">
       Total: <span id="summaryTotal">$0.00</span><br>
       Weight: <span id="summaryWeight">—</span>
     </div>
   </div>
-
 </div>
 
+<hr>
+<h2>Contact & Shipping Information</h2>
+<form id="orderForm">
+  <label>Full Name:<br>
+    <input type="text" id="customerName" required>
+  </label>
+  <label>Email Address:<br>
+    <input type="email" id="customerEmail" required>
+  </label>
+  <label>Shipping Address:<br>
+    <textarea id="customerAddress" rows="4" required></textarea>
+  </label>
+  <button type="submit">Submit Order</button>
+</form>
+<p id="orderStatus" style="font-weight:bold;"></p>
+
 <script>
+// ----------------- Paddle Data -----------------
 const SHIPPING_COST = 10;
 
-/* DOM */
-const itemForm = document.getElementById("itemForm");
-const itemTotalCost = document.getElementById("itemTotalCost");
-const itemTotalWeight = document.getElementById("itemTotalWeight");
-const summaryContent = document.getElementById("summaryContent");
-const summaryTotal = document.getElementById("summaryTotal");
-const summaryWeight = document.getElementById("summaryWeight");
-
-/* OPTIONS */
 const bladeShapes = [
   { name: "Traditional", price: 0 },
   { name: "Cyber", price: 0 }
@@ -97,7 +102,10 @@ const plyOptions = [
   { name: "ZLC", weight: 7.56, price: 42 }
 ];
 
-/* Blade Shape */
+// ----------------- Build Form -----------------
+const itemForm = document.getElementById("itemForm");
+
+// Blade Shape
 itemForm.innerHTML += `<label>Blade Shape:</label><br>`;
 const bladeSelect = document.createElement("select");
 bladeShapes.forEach(b => {
@@ -105,23 +113,26 @@ bladeShapes.forEach(b => {
 });
 itemForm.append(bladeSelect, document.createElement("br"), document.createElement("br"));
 
-/* Build Type */
+// Build Type
 itemForm.innerHTML += `
-<label><input type="radio" name="buildType" value="model" checked> Blade by Name</label><br>
-<label><input type="radio" name="buildType" value="custom"> Custom Ply Build</label><br><br>
-`;
+<label>
+  <input type="radio" name="buildType" value="model" checked> Blade by Name
+</label>
+<label>
+  <input type="radio" name="buildType" value="custom"> Custom Ply Build
+</label>
+<br><br>`;
 
-/* Model Select */
+// Blade Model
 const modelSelect = document.createElement("select");
 bladeModels.forEach(m => {
   modelSelect.innerHTML += `<option data-price="${m.price}">${m.name} - $${m.price}</option>`;
 });
-itemForm.append("Blade Model:", document.createElement("br"), modelSelect, document.createElement("br"), document.createElement("br"));
+itemForm.append(document.createTextNode("Blade Model:"), document.createElement("br"), modelSelect, document.createElement("br"), document.createElement("br"));
 
-/* Ply Section */
+// Ply Section
 const plyContainer = document.createElement("div");
 plyContainer.classList.add("hidden");
-
 for (let i = 1; i <= 8; i++) {
   const sel = document.createElement("select");
   sel.className = "ply";
@@ -132,21 +143,20 @@ for (let i = 1; i <= 8; i++) {
 }
 itemForm.append(plyContainer, document.createElement("br"));
 
-/* Handle */
+// Handle
 const handleSelect = document.createElement("select");
 handleOptions.forEach(h => {
   handleSelect.innerHTML += `<option data-price="${h.price}" data-weight="${h.weight}">${h.name} - $${h.price}</option>`;
 });
-itemForm.append("Handle:", document.createElement("br"), handleSelect);
+itemForm.append(document.createTextNode("Handle:"), document.createElement("br"), handleSelect);
 
-/* CALCULATION */
+// ----------------- Calculate -----------------
 function calculate() {
   let cost = SHIPPING_COST;
   let weight = 0;
   let summary = "";
 
   summary += `<div class="summary-line">Blade Shape: ${bladeSelect.value}</div>`;
-
   const buildType = document.querySelector('input[name="buildType"]:checked').value;
 
   if (buildType === "model") {
@@ -171,76 +181,65 @@ function calculate() {
     summary += `<div class="summary-line">Handle: ${h.textContent}</div>`;
   }
 
-  summary += `<div class="summary-line">Shipping: $10.00</div>`;
+  summary += `<div class="summary-line">Shipping: $${SHIPPING_COST.toFixed(2)}</div>`;
 
-  itemTotalCost.textContent = `$${cost.toFixed(2)}`;
-  itemTotalWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
-  summaryContent.innerHTML = summary;
-  summaryTotal.textContent = `$${cost.toFixed(2)}`;
-  summaryWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
+  document.getElementById("itemTotalCost").textContent = `$${cost.toFixed(2)}`;
+  document.getElementById("itemTotalWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
+  document.getElementById("summaryContent").innerHTML = summary;
+  document.getElementById("summaryTotal").textContent = `$${cost.toFixed(2)}`;
+  document.getElementById("summaryWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
 }
 
-/* EVENTS */
+// Events
 itemForm.addEventListener("change", calculate);
-
-document.querySelectorAll('input[name="buildType"]').forEach(r => {
-  r.addEventListener("change", () => {
-    const buildType = document.querySelector('input[name="buildType"]:checked').value;
-    modelSelect.classList.toggle("hidden", buildType !== "model");
-    plyContainer.classList.toggle("hidden", buildType !== "custom");
+document.querySelectorAll('input[name="buildType"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    modelSelect.classList.toggle("hidden", radio.value !== "model");
+    plyContainer.classList.toggle("hidden", radio.value !== "custom");
     calculate();
   });
 });
 
 calculate();
-</script>
 
-<hr>
-
-<h2>Contact & Shipping Information</h2>
-
-<form id="orderForm">
-  <label>Full Name:<br><input type="text" id="customerName" required></label><br><br>
-  <label>Email Address:<br><input type="email" id="customerEmail" required></label><br><br>
-  <label>Shipping Address:<br><textarea id="customerAddress" rows="4" required></textarea></label><br><br>
-  <button type="submit">Submit Order</button>
-</form>
-
-<p id="orderStatus" style="font-weight:bold;"></p>
-
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzA2CPkMlDCQCiUfsQVhNb85_qnwrJ2Q5LGtsgCwVa22ElNcpFodPiW8-vjVw1DG5DlJw/exec
-document.getElementById("orderForm").addEventListener("submit", async e => {
-  e.preventDefault();
-
+// ----------------- Submit Order -----------------
+document.addEventListener("DOMContentLoaded", () => {
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzA2CPkMlDCQCiUfsQVhNb85_qnwrJ2Q5LGtsgCwVa22ElNcpFodPiW8-vjVw1DG5DlJw/exec"; // <-- REPLACE with your deployed Web App URL
+  const orderForm = document.getElementById("orderForm");
   const status = document.getElementById("orderStatus");
-  status.textContent = "Submitting order…";
 
-  const data = {
-    name: customerName.value,
-    email: customerEmail.value,
-    address: customerAddress.value,
-    totalCost: summaryTotal.textContent,
-    totalWeight: summaryWeight.textContent,
-    orderSummary: summaryContent.innerText
-  };
+  orderForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    status.textContent = "Submitting order…";
 
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+    const orderData = {
+      name: document.getElementById("customerName").value,
+      email: document.getElementById("customerEmail").value,
+      address: document.getElementById("customerAddress").value,
+      totalCost: document.getElementById("summaryTotal").textContent,
+      totalWeight: document.getElementById("summaryWeight").textContent,
+      orderSummary: document.getElementById("summaryContent").innerText,
+      timestamp: new Date().toISOString()
+    };
 
-    if (!res.ok) throw new Error();
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(orderData),
+        headers: { "Content-Type": "application/json" }
+      });
 
-    status.textContent = "✅ Order submitted successfully!";
-    e.target.reset();
-  } catch {
-    status.textContent = "❌ Error submitting order.";
-  }
+      if (!response.ok) throw new Error("Network error");
+
+      status.textContent = "✅ Order submitted successfully!";
+      orderForm.reset();
+    } catch (err) {
+      console.error(err);
+      status.textContent = "❌ Error submitting order.";
+    }
+  });
 });
 </script>
-
 </body>
 </html>
+
