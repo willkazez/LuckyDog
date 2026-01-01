@@ -30,7 +30,6 @@
 
 <div class="container">
 
-  <!-- LEFT -->
   <div class="form-section">
     <form id="itemForm"></form>
 
@@ -39,7 +38,6 @@
     <p>Total Weight: <span id="itemTotalWeight">—</span></p>
   </div>
 
-  <!-- RIGHT -->
   <div class="summary-panel">
     <h3>Order Summary</h3>
     <div id="summaryContent"></div>
@@ -54,6 +52,14 @@
 
 <script>
 const SHIPPING_COST = 10;
+
+/* DOM */
+const itemForm = document.getElementById("itemForm");
+const itemTotalCost = document.getElementById("itemTotalCost");
+const itemTotalWeight = document.getElementById("itemTotalWeight");
+const summaryContent = document.getElementById("summaryContent");
+const summaryTotal = document.getElementById("summaryTotal");
+const summaryWeight = document.getElementById("summaryWeight");
 
 /* OPTIONS */
 const bladeShapes = [
@@ -91,36 +97,31 @@ const plyOptions = [
   { name: "ZLC", weight: 7.56, price: 42 }
 ];
 
-const itemForm = document.getElementById("itemForm");
-
 /* Blade Shape */
-form.innerHTML += `<label>Blade Shape:</label><br>`;
+itemForm.innerHTML += `<label>Blade Shape:</label><br>`;
 const bladeSelect = document.createElement("select");
 bladeShapes.forEach(b => {
   bladeSelect.innerHTML += `<option data-price="${b.price}">${b.name}</option>`;
 });
-form.append(bladeSelect, document.createElement("br"), document.createElement("br"));
+itemForm.append(bladeSelect, document.createElement("br"), document.createElement("br"));
 
 /* Build Type */
-form.innerHTML += `
-<label>
-  <input type="radio" name="buildType" value="model" checked> Blade by Name
-</label><br>
-<label>
-  <input type="radio" name="buildType" value="custom"> Custom Ply Build
-</label><br><br>
+itemForm.innerHTML += `
+<label><input type="radio" name="buildType" value="model" checked> Blade by Name</label><br>
+<label><input type="radio" name="buildType" value="custom"> Custom Ply Build</label><br><br>
 `;
 
-/* Model Blade */
+/* Model Select */
 const modelSelect = document.createElement("select");
 bladeModels.forEach(m => {
   modelSelect.innerHTML += `<option data-price="${m.price}">${m.name} - $${m.price}</option>`;
 });
-form.append("Blade Model:", document.createElement("br"), modelSelect, document.createElement("br"), document.createElement("br"));
+itemForm.append("Blade Model:", document.createElement("br"), modelSelect, document.createElement("br"), document.createElement("br"));
 
 /* Ply Section */
 const plyContainer = document.createElement("div");
 plyContainer.classList.add("hidden");
+
 for (let i = 1; i <= 8; i++) {
   const sel = document.createElement("select");
   sel.className = "ply";
@@ -129,16 +130,16 @@ for (let i = 1; i <= 8; i++) {
   });
   plyContainer.append(`Ply ${i}: `, sel, document.createElement("br"));
 }
-form.append(plyContainer, document.createElement("br"));
+itemForm.append(plyContainer, document.createElement("br"));
 
 /* Handle */
 const handleSelect = document.createElement("select");
 handleOptions.forEach(h => {
   handleSelect.innerHTML += `<option data-price="${h.price}" data-weight="${h.weight}">${h.name} - $${h.price}</option>`;
 });
-form.append("Handle:", document.createElement("br"), handleSelect);
+itemForm.append("Handle:", document.createElement("br"), handleSelect);
 
-/* LOGIC */
+/* CALCULATION */
 function calculate() {
   let cost = SHIPPING_COST;
   let weight = 0;
@@ -184,8 +185,9 @@ itemForm.addEventListener("change", calculate);
 
 document.querySelectorAll('input[name="buildType"]').forEach(r => {
   r.addEventListener("change", () => {
-    modelSelect.classList.toggle("hidden", r.value !== "model");
-    plyContainer.classList.toggle("hidden", r.value !== "custom");
+    const buildType = document.querySelector('input[name="buildType"]:checked').value;
+    modelSelect.classList.toggle("hidden", buildType !== "model");
+    plyContainer.classList.toggle("hidden", buildType !== "custom");
     calculate();
   });
 });
@@ -198,64 +200,48 @@ calculate();
 <h2>Contact & Shipping Information</h2>
 
 <form id="orderForm">
-  <label>
-    Full Name:<br>
-    <input type="text" id="customerName" required>
-  </label><br><br>
-
-  <label>
-    Email Address:<br>
-    <input type="email" id="customerEmail" required>
-  </label><br><br>
-
-  <label>
-    Shipping Address:<br>
-    <textarea id="customerAddress" rows="4" required></textarea>
-  </label><br><br>
-
+  <label>Full Name:<br><input type="text" id="customerName" required></label><br><br>
+  <label>Email Address:<br><input type="email" id="customerEmail" required></label><br><br>
+  <label>Shipping Address:<br><textarea id="customerAddress" rows="4" required></textarea></label><br><br>
   <button type="submit">Submit Order</button>
 </form>
 
 <p id="orderStatus" style="font-weight:bold;"></p>
+
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdoODKfeMO5cckvWo8uEUpbvlk3--MgcTBetMVU5k8nimdju4B8OZZ3UWiOhHdR7m4/exec";
 
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdoODKfeMO5cckvWo8uEUpbvlk3--MgcTBetMVU5k8nimdju4B8OZZ3UWiOhHdR7m4/exec";
+document.getElementById("orderForm").addEventListener("submit", async e => {
+  e.preventDefault();
 
-  const form = document.getElementById("orderForm");
   const status = document.getElementById("orderStatus");
+  status.textContent = "Submitting order…";
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    status.textContent = "Submitting order…";
+  const data = {
+    name: customerName.value,
+    email: customerEmail.value,
+    address: customerAddress.value,
+    totalCost: summaryTotal.textContent,
+    totalWeight: summaryWeight.textContent,
+    orderSummary: summaryContent.innerText
+  };
 
-    const orderData = {
-      name: document.getElementById("customerName").value,
-      email: document.getElementById("customerEmail").value,
-      address: document.getElementById("customerAddress").value,
-      totalCost: document.getElementById("summaryTotal").textContent,
-      totalWeight: document.getElementById("summaryWeight").textContent,
-      orderSummary: document.getElementById("summaryContent").innerText,
-      timestamp: new Date().toISOString()
-    };
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-    try {
-      const response = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(orderData),
-        headers: { "Content-Type": "application/json" }
-      });
+    if (!res.ok) throw new Error();
 
-      if (!response.ok) throw new Error("Network error");
-
-      status.textContent = "✅ Order submitted successfully!";
-      form.reset();
-    } catch (err) {
-      console.error(err);
-      status.textContent = "❌ Error submitting order.";
-    }
-  });
+    status.textContent = "✅ Order submitted successfully!";
+    e.target.reset();
+  } catch {
+    status.textContent = "❌ Error submitting order.";
+  }
 });
 </script>
+
 </body>
 </html>
