@@ -1,0 +1,175 @@
+// ----------------- Paddle Data -----------------
+const SHIPPING_COST = 10;
+
+const bladeShapes = [
+  { name: "Traditional", price: 0 },
+  { name: "Cyber", price: 0 }
+];
+
+const bladeModels = [
+  { name: "Greyhound", price: 127 },
+  { name: "Greyhound Z", price: 137 },
+  { name: "Whippet", price: 127 },
+  { name: "Goldendoodle", price: 89 },
+  { name: "Goldendoodle Z", price: 95 }
+];
+
+const handleOptions = [
+  { name: "None", weight: 0, price: 0 },
+  { name: "Kiri (11g)", weight: 11, price: 16 },
+  { name: "Walnut (23g)", weight: 23, price: 17 },
+  { name: "Kassod (27g)", weight: 27, price: 16 },
+  { name: "Redwood (33g)", weight: 33, price: 16 },
+  { name: "Rosewood (38g)", weight: 38, price: 20 }
+];
+
+const plyOptions = [
+  { name: "None", weight: 0, price: 0 },
+  { name: "Koto (0.5mm)", weight: 8.47, price: 8 },
+  { name: "Limba (0.5mm)", weight: 8.0, price: 8 },
+  { name: "Ayous (0.8mm)", weight: 8.25, price: 8 },
+  { name: "Balsa core (3mm)", weight: 10.8, price: 15 },
+  { name: "Balsa core (5mm)", weight: 25.68, price: 18 },
+  { name: "Ayous core (3mm)", weight: 30.6, price: 12 },
+  { name: "Kiri core (3mm)", weight: 24.0, price: 12 },
+  { name: "Super ALC", weight: 6.0, price: 37 },
+  { name: "ZLC", weight: 7.56, price: 42 }
+];
+
+// ----------------- Build Form -----------------
+const itemForm = document.getElementById("itemForm");
+
+// Blade Shape
+itemForm.innerHTML += `<label>Blade Shape:</label><br>`;
+const bladeSelect = document.createElement("select");
+bladeShapes.forEach(b => {
+  bladeSelect.innerHTML += `<option data-price="${b.price}">${b.name}</option>`;
+});
+itemForm.append(bladeSelect, document.createElement("br"), document.createElement("br"));
+
+// Build Type
+itemForm.innerHTML += `
+<label>
+  <input type="radio" name="buildType" value="model" checked> Blade by Name
+</label>
+<label>
+  <input type="radio" name="buildType" value="custom"> Custom Ply Build
+</label>
+<br><br>`;
+
+// Blade Model
+const modelSelect = document.createElement("select");
+bladeModels.forEach(m => {
+  modelSelect.innerHTML += `<option data-price="${m.price}">${m.name} - $${m.price}</option>`;
+});
+itemForm.append(document.createTextNode("Blade Model:"), document.createElement("br"), modelSelect, document.createElement("br"), document.createElement("br"));
+
+// Ply Section
+const plyContainer = document.createElement("div");
+plyContainer.classList.add("hidden");
+for (let i = 1; i <= 8; i++) {
+  const sel = document.createElement("select");
+  sel.className = "ply";
+  plyOptions.forEach(p => {
+    sel.innerHTML += `<option data-price="${p.price}" data-weight="${p.weight}">${p.name}</option>`;
+  });
+  plyContainer.append(`Ply ${i}: `, sel, document.createElement("br"));
+}
+itemForm.append(plyContainer, document.createElement("br"));
+
+// Handle
+const handleSelect = document.createElement("select");
+handleOptions.forEach(h => {
+  handleSelect.innerHTML += `<option data-price="${h.price}" data-weight="${h.weight}">${h.name} - $${h.price}</option>`;
+});
+itemForm.append(document.createTextNode("Handle:"), document.createElement("br"), handleSelect);
+
+// ----------------- Calculate -----------------
+function calculate() {
+  let cost = SHIPPING_COST;
+  let weight = 0;
+  let summary = "";
+
+  summary += `<div class="summary-line">Blade Shape: ${bladeSelect.value}</div>`;
+  const buildType = document.querySelector('input[name="buildType"]:checked').value;
+
+  if (buildType === "model") {
+    const m = modelSelect.selectedOptions[0];
+    cost += Number(m.dataset.price);
+    summary += `<div class="summary-line">Model: ${m.textContent}</div>`;
+  } else {
+    document.querySelectorAll(".ply").forEach((p, i) => {
+      const opt = p.selectedOptions[0];
+      if (!opt.textContent.startsWith("None")) {
+        summary += `<div class="summary-line">Ply ${i + 1}: ${opt.textContent}</div>`;
+      }
+      cost += Number(opt.dataset.price);
+      weight += Number(opt.dataset.weight);
+    });
+  }
+
+  const h = handleSelect.selectedOptions[0];
+  cost += Number(h.dataset.price);
+  weight += Number(h.dataset.weight);
+  if (!h.textContent.startsWith("None")) {
+    summary += `<div class="summary-line">Handle: ${h.textContent}</div>`;
+  }
+
+  summary += `<div class="summary-line">Shipping: $${SHIPPING_COST.toFixed(2)}</div>`;
+
+  document.getElementById("itemTotalCost").textContent = `$${cost.toFixed(2)}`;
+  document.getElementById("itemTotalWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
+  document.getElementById("summaryContent").innerHTML = summary;
+  document.getElementById("summaryTotal").textContent = `$${cost.toFixed(2)}`;
+  document.getElementById("summaryWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
+}
+
+// Events
+itemForm.addEventListener("change", calculate);
+document.querySelectorAll('input[name="buildType"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    modelSelect.classList.toggle("hidden", radio.value !== "model");
+    plyContainer.classList.toggle("hidden", radio.value !== "custom");
+    calculate();
+  });
+});
+
+calculate();
+
+// ----------------- Submit Order -----------------
+const orderForm = document.getElementById("orderForm");
+const status = document.getElementById("orderStatus");
+
+// Replace this URL with your current deployed Apps Script URL
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbro6_Ir82fTVktfvIA2NEM4hfjgU-Ok9drCHWuolfIHQ3jxzZ2CTqVL1HDlN9zFwwbg/exec";
+
+orderForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  status.textContent = "Submitting order…";
+
+  const data = new URLSearchParams({
+    name: customerName.value,
+    email: customerEmail.value,
+    address: customerAddress.value,
+    totalCost: summaryTotal.textContent,
+    totalWeight: summaryWeight.textContent,
+    orderSummary: summaryContent.innerText,
+    timestamp: new Date().toISOString()
+  });
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: data
+    });
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(text);
+
+    status.textContent = "✅ Order submitted successfully!";
+    orderForm.reset();
+  } catch (err) {
+    console.error(err);
+    status.textContent = "❌ Submission failed";
+  }
+});
