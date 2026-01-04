@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Paddle Options and Pricing</title>
-  <link rel="stylesheet" href="style.css">
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     .container { display: flex; gap: 40px; align-items: flex-start; }
@@ -28,6 +27,7 @@
 <h1>Paddle Options and Pricing</h1>
 
 <div class="container">
+  <!-- LEFT: Paddle Options -->
   <div class="form-section">
     <form id="itemForm"></form>
 
@@ -36,6 +36,7 @@
     <p>Total Weight: <span id="itemTotalWeight">—</span></p>
   </div>
 
+  <!-- RIGHT: Summary Panel -->
   <div class="summary-panel">
     <h3>Order Summary</h3>
     <div id="summaryContent"></div>
@@ -49,13 +50,21 @@
 <hr>
 <h2>Contact & Shipping Information</h2>
 <form id="orderForm">
-  <label>Full Name:<br><input type="text" id="customerName" required></label>
-  <label>Email Address:<br><input type="email" id="customerEmail" required></label>
-  <label>Shipping Address:<br><textarea id="customerAddress" rows="4" required></textarea></label>
+  <label>Full Name:<br>
+    <input type="text" id="customerName" required>
+  </label>
+  <label>Email Address:<br>
+    <input type="email" id="customerEmail" required>
+  </label>
+  <label>Shipping Address:<br>
+    <textarea id="customerAddress" rows="4" required></textarea>
+  </label>
   <button type="submit">Submit Order</button>
 </form>
 <p id="orderStatus" style="font-weight:bold;"></p>
 
-<script src="script.js" defer></script>
+<!-- Link to script.js -->
+<script src="script.js"></script>
+
 </body>
 </html>
