@@ -1,6 +1,12 @@
-// ----------------- Paddle Data -----------------
+/********************
+ * CONFIG
+ ********************/
 const SHIPPING_COST = 10;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
 
+/********************
+ * DATA
+ ********************/
 const bladeShapes = [
   { name: "Traditional", price: 0 },
   { name: "Cyber", price: 0 }
@@ -36,161 +42,11 @@ const plyOptions = [
   { name: "ZLC", weight: 7.56, price: 42 }
 ];
 
-// ----------------- Build Form -----------------
+/********************
+ * BUILD FORM
+ ********************/
 const itemForm = document.getElementById("itemForm");
 
 // Blade Shape
-itemForm.innerHTML += `<label>Blade Shape:</label><br>`;
-const bladeSelect = document.createElement("select");
-bladeShapes.forEach(b => {
-  bladeSelect.innerHTML += `<option data-price="${b.price}">${b.name}</option>`;
-});
-itemForm.append(bladeSelect, document.createElement("br"), document.createElement("br"));
-
-// Build Type
-itemForm.innerHTML += `
-<label>
-  <input type="radio" name="buildType" value="model" checked> Blade by Name
-</label>
-<label>
-  <input type="radio" name="buildType" value="custom"> Custom Ply Build
-</label>
-<br><br>`;
-
-// Blade Model
-const modelSelect = document.createElement("select");
-bladeModels.forEach(m => {
-  modelSelect.innerHTML += `<option data-price="${m.price}">${m.name} - $${m.price}</option>`;
-});
-itemForm.append(document.createTextNode("Blade Model:"), document.createElement("br"), modelSelect, document.createElement("br"), document.createElement("br"));
-
-// Ply Section
-const plyContainer = document.createElement("div");
-plyContainer.classList.add("hidden");
-for (let i = 1; i <= 8; i++) {
-  const sel = document.createElement("select");
-  sel.className = "ply";
-  plyOptions.forEach(p => {
-    sel.innerHTML += `<option data-price="${p.price}" data-weight="${p.weight}">${p.name}</option>`;
-  });
-  plyContainer.append(`Ply ${i}: `, sel, document.createElement("br"));
-}
-itemForm.append(plyContainer, document.createElement("br"));
-
-// Handle
-const handleSelect = document.createElement("select");
-handleOptions.forEach(h => {
-  handleSelect.innerHTML += `<option data-price="${h.price}" data-weight="${h.weight}">${h.name} - $${h.price}</option>`;
-});
-itemForm.append(document.createTextNode("Handle:"), document.createElement("br"), handleSelect);
-
-// ----------------- Calculate -----------------
-function calculate() {
-  let cost = SHIPPING_COST;
-  let weight = 0;
-  let summary = "";
-
-  summary += `<div class="summary-line">Blade Shape: ${bladeSelect.value}</div>`;
-  const buildType = document.querySelector('input[name="buildType"]:checked').value;
-
-  if (buildType === "model") {
-    const m = modelSelect.selectedOptions[0];
-    cost += Number(m.dataset.price);
-    summary += `<div class="summary-line">Model: ${m.textContent}</div>`;
-  } else {
-    document.querySelectorAll(".ply").forEach((p, i) => {
-      const opt = p.selectedOptions[0];
-      if (!opt.textContent.startsWith("None")) {
-        summary += `<div class="summary-line">Ply ${i + 1}: ${opt.textContent}</div>`;
-      }
-      cost += Number(opt.dataset.price);
-      weight += Number(opt.dataset.weight);
-    });
-  }
-
-  const h = handleSelect.selectedOptions[0];
-  cost += Number(h.dataset.price);
-  weight += Number(h.dataset.weight);
-  if (!h.textContent.startsWith("None")) {
-    summary += `<div class="summary-line">Handle: ${h.textContent}</div>`;
-  }
-
-  summary += `<div class="summary-line">Shipping: $${SHIPPING_COST.toFixed(2)}</div>`;
-
-  document.getElementById("itemTotalCost").textContent = `$${cost.toFixed(2)}`;
-  document.getElementById("itemTotalWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
-  document.getElementById("summaryContent").innerHTML = summary;
-  document.getElementById("summaryTotal").textContent = `$${cost.toFixed(2)}`;
-  document.getElementById("summaryWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
-}
-
-// Events
-itemForm.addEventListener("change", calculate);
-
-// ----------------- Toggle Build Type with Debug -----------------
-function updateBuildType() {
-  const buildTypeRadio = document.querySelector('input[name="buildType"]:checked');
-  if (!buildTypeRadio) {
-    console.warn("No radio button checked for buildType!");
-    return;
-  }
-
-  console.log("Selected build type:", buildTypeRadio.value);
-  console.log("Before toggle:", modelSelect, plyContainer);
-
-  modelSelect.classList.toggle("hidden", buildTypeRadio.value !== "model");
-  plyContainer.classList.toggle("hidden", buildTypeRadio.value !== "custom");
-
-  console.log("After toggle:", modelSelect.className, plyContainer.className);
-
-  calculate();
-}
-
-document.querySelectorAll('input[name="buildType"]').forEach(radio => {
-  radio.addEventListener("change", updateBuildType);
-});
-
-// Initialize correct state
-updateBuildType();
-calculate();
-
-// ----------------- Submit Order -----------------
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
-
-const orderForm = document.getElementById("orderForm");
-const status = document.getElementById("orderStatus");
-
-orderForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  status.textContent = "Submitting order…";
-
-  const orderData = {
-    name: document.getElementById("customerName").value,
-    email: document.getElementById("customerEmail").value,
-    address: document.getElementById("customerAddress").value,
-    totalCost: document.getElementById("summaryTotal").textContent,
-    totalWeight: document.getElementById("summaryWeight").textContent,
-    orderSummary: document.getElementById("summaryContent").innerText,
-    timestamp: new Date().toISOString()
-  };
-
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData)
-    });
-
-    if (!response.ok) {
-      throw new Error(await response.text());
-    }
-
-    status.textContent = "✅ Order submitted successfully!";
-    orderForm.reset();
-    updateBuildType(); // reset toggle view
-    calculate();       // recalc totals
-  } catch (err) {
-    console.error(err);
-    status.textContent = "❌ Error submitting order.";
-  }
-});
+itemForm.append("Blade Shape:", document.createElement("br"));
+const bladeSelect = document.c
