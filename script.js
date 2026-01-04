@@ -6,6 +6,21 @@ const SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
 
 /***********************
+ * DOM REFERENCES
+ ***********************/
+const itemForm = document.getElementById("itemForm");
+const orderForm = document.getElementById("orderForm");
+const orderStatus = document.getElementById("orderStatus");
+
+const customerName = document.getElementById("customerName");
+const customerEmail = document.getElementById("customerEmail");
+const customerAddress = document.getElementById("customerAddress");
+
+const summaryTotal = document.getElementById("summaryTotal");
+const summaryWeight = document.getElementById("summaryWeight");
+const summaryContent = document.getElementById("summaryContent");
+
+/***********************
  * DATA
  ***********************/
 const bladeShapes = [
@@ -46,17 +61,13 @@ const plyOptions = [
 /***********************
  * BUILD FORM
  ***********************/
-const itemForm = document.getElementById("itemForm");
-
-// Blade Shape
 itemForm.insertAdjacentHTML("beforeend", "<label>Blade Shape:</label>");
 const bladeSelect = document.createElement("select");
 bladeShapes.forEach(b => {
-  bladeSelect.innerHTML += `<option data-price="${b.price}">${b.name}</option>`;
+  bladeSelect.innerHTML += `<option>${b.name}</option>`;
 });
 itemForm.append(bladeSelect, document.createElement("br"), document.createElement("br"));
 
-// Build Type
 itemForm.insertAdjacentHTML(
   "beforeend",
   `
@@ -66,7 +77,6 @@ itemForm.insertAdjacentHTML(
 `
 );
 
-// Blade Model
 const modelLabel = document.createElement("div");
 modelLabel.textContent = "Blade Model:";
 const modelSelect = document.createElement("select");
@@ -75,23 +85,19 @@ bladeModels.forEach(m => {
 });
 itemForm.append(modelLabel, modelSelect, document.createElement("br"), document.createElement("br"));
 
-// Ply Container
 const plyContainer = document.createElement("div");
 plyContainer.classList.add("hidden");
 
 for (let i = 1; i <= 8; i++) {
   const sel = document.createElement("select");
   sel.className = "ply";
-
   plyOptions.forEach(p => {
     sel.innerHTML += `<option data-price="${p.price}" data-weight="${p.weight}">${p.name}</option>`;
   });
-
   plyContainer.append(`Ply ${i}: `, sel, document.createElement("br"));
 }
 itemForm.append(plyContainer, document.createElement("br"));
 
-// Handle
 itemForm.append("Handle:", document.createElement("br"));
 const handleSelect = document.createElement("select");
 handleOptions.forEach(h => {
@@ -137,60 +143,4 @@ function calculate() {
   summary += `<div class="summary-line">Shipping: $${SHIPPING_COST.toFixed(2)}</div>`;
 
   document.getElementById("itemTotalCost").textContent = `$${cost.toFixed(2)}`;
-  document.getElementById("itemTotalWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
-  document.getElementById("summaryContent").innerHTML = summary;
-  document.getElementById("summaryTotal").textContent = `$${cost.toFixed(2)}`;
-  document.getElementById("summaryWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
-}
-
-/***********************
- * EVENTS
- ***********************/
-itemForm.addEventListener("change", calculate);
-
-document.querySelectorAll('input[name="buildType"]').forEach(radio => {
-  radio.addEventListener("change", () => {
-    modelSelect.classList.toggle("hidden", radio.value !== "model");
-    modelLabel.classList.toggle("hidden", radio.value !== "model");
-    plyContainer.classList.toggle("hidden", radio.value !== "custom");
-    calculate();
-  });
-});
-
-calculate();
-
-/***********************
- * SUBMIT ORDER
- ***********************/
-orderForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  orderStatus.textContent = "Submitting order…";
-
-  const orderData = {
-    name: customerName.value,
-    email: customerEmail.value,
-    address: customerAddress.value,
-    totalCost: summaryTotal.textContent,
-    totalWeight: summaryWeight.textContent,
-    orderSummary: summaryContent.innerText,
-    timestamp: new Date().toISOString()
-  };
-
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData)
-    });
-
-    const text = await response.text();
-    if (!response.ok) throw new Error(text);
-
-    orderStatus.textContent = "✅ Order submitted successfully!";
-    orderForm.reset();
-    calculate();
-  } catch (err) {
-    console.error(err);
-    orderStatus.textContent = "❌ Error submitting order.";
-  }
-});
+  document.getElementById("itemTotalWeight").textContent = wei
