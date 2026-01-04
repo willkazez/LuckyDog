@@ -126,50 +126,60 @@ function calculate() {
 
 // Events
 itemForm.addEventListener("change", calculate);
+
+// ----------------- Toggle Build Type -----------------
+function updateBuildType() {
+  const buildType = document.querySelector('input[name="buildType"]:checked').value;
+  modelSelect.classList.toggle("hidden", buildType !== "model");
+  plyContainer.classList.toggle("hidden", buildType !== "custom");
+  calculate();
+}
+
 document.querySelectorAll('input[name="buildType"]').forEach(radio => {
-  radio.addEventListener("change", () => {
-    modelSelect.classList.toggle("hidden", radio.value !== "model");
-    plyContainer.classList.toggle("hidden", radio.value !== "custom");
-    calculate();
-  });
+  radio.addEventListener("change", updateBuildType);
 });
 
+// Initialize correct state
+updateBuildType();
 calculate();
 
 // ----------------- Submit Order -----------------
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
+
 const orderForm = document.getElementById("orderForm");
 const status = document.getElementById("orderStatus");
-
-// Replace this URL with your current deployed Apps Script URL
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
 
 orderForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   status.textContent = "Submitting order…";
 
-  const data = new URLSearchParams({
-    name: customerName.value,
-    email: customerEmail.value,
-    address: customerAddress.value,
-    totalCost: summaryTotal.textContent,
-    totalWeight: summaryWeight.textContent,
-    orderSummary: summaryContent.innerText,
+  const orderData = {
+    name: document.getElementById("customerName").value,
+    email: document.getElementById("customerEmail").value,
+    address: document.getElementById("customerAddress").value,
+    totalCost: document.getElementById("summaryTotal").textContent,
+    totalWeight: document.getElementById("summaryWeight").textContent,
+    orderSummary: document.getElementById("summaryContent").innerText,
     timestamp: new Date().toISOString()
-  });
+  };
 
   try {
-    const res = await fetch(SCRIPT_URL, {
+    const response = await fetch(SCRIPT_URL, {
       method: "POST",
-      body: data
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData)
     });
 
-    const text = await res.text();
-    if (!res.ok) throw new Error(text);
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
 
     status.textContent = "✅ Order submitted successfully!";
     orderForm.reset();
+    updateBuildType(); // reset toggle view
+    calculate();       // recalc totals
   } catch (err) {
     console.error(err);
-    status.textContent = "❌ Submission failed";
+    status.textContent = "❌ Error submitting order.";
   }
 });
