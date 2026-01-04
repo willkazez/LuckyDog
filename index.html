@@ -10,6 +10,7 @@
 <h1>Paddle Options and Pricing</h1>
 
 <div class="container">
+  <!-- LEFT: Paddle Options -->
   <div class="form-section">
     <form id="itemForm"></form>
 
@@ -18,6 +19,7 @@
     <p>Total Weight: <span id="itemTotalWeight">—</span></p>
   </div>
 
+  <!-- RIGHT: Summary Panel -->
   <div class="summary-panel">
     <h3>Order Summary</h3>
     <div id="summaryContent"></div>
@@ -32,14 +34,16 @@
 
 <h2>Contact & Shipping Information</h2>
 <form id="orderForm">
-  <label>Full Name<br><input id="customerName" required></label>
-  <label>Email<br><input id="customerEmail" type="email" required></label>
-  <label>Address<br><textarea id="customerAddress" required></textarea></label>
+  <label>Full Name:<br><input type="text" id="customerName" required></label>
+  <label>Email Address:<br><input type="email" id="customerEmail" required></label>
+  <label>Shipping Address:<br><textarea id="customerAddress" rows="4" required></textarea></label>
   <button type="submit">Submit Order</button>
 </form>
 
-<p id="orderStatus"></p>
+<p id="orderStatus" style="font-weight:bold;"></p>
 
-<script src="script.js"></script>
+<!-- Load JS separately to satisfy GitHub Pages CSP -->
+<script src="script.js" defer></script>
+
 </body>
 </html>
