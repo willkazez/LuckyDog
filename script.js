@@ -1,11 +1,13 @@
-/********************
+/***********************
  * CONFIG
- ********************/
+ ***********************/
 const SHIPPING_COST = 10;
-const SCRIPT_URL = "https://script.google.com/home/projects/1mwRpNM60t4WiFAfVY3d6Xl54uilsmc_K1-XfT-7KsQAAGamSxdbCiFoK/edit";
-/********************
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
+
+/***********************
  * DATA
- ********************/
+ ***********************/
 const bladeShapes = [
   { name: "Traditional", price: 0 },
   { name: "Cyber", price: 0 }
@@ -41,11 +43,154 @@ const plyOptions = [
   { name: "ZLC", weight: 7.56, price: 42 }
 ];
 
-/********************
+/***********************
  * BUILD FORM
- ********************/
+ ***********************/
 const itemForm = document.getElementById("itemForm");
 
 // Blade Shape
-itemForm.append("Blade Shape:", document.createElement("br"));
-const bladeSelect = document.c
+itemForm.insertAdjacentHTML("beforeend", "<label>Blade Shape:</label>");
+const bladeSelect = document.createElement("select");
+bladeShapes.forEach(b => {
+  bladeSelect.innerHTML += `<option data-price="${b.price}">${b.name}</option>`;
+});
+itemForm.append(bladeSelect, document.createElement("br"), document.createElement("br"));
+
+// Build Type
+itemForm.insertAdjacentHTML(
+  "beforeend",
+  `
+<label><input type="radio" name="buildType" value="model" checked> Blade by Name</label>
+<label><input type="radio" name="buildType" value="custom"> Custom Ply Build</label>
+<br><br>
+`
+);
+
+// Blade Model
+const modelLabel = document.createElement("div");
+modelLabel.textContent = "Blade Model:";
+const modelSelect = document.createElement("select");
+bladeModels.forEach(m => {
+  modelSelect.innerHTML += `<option data-price="${m.price}">${m.name} - $${m.price}</option>`;
+});
+itemForm.append(modelLabel, modelSelect, document.createElement("br"), document.createElement("br"));
+
+// Ply Container
+const plyContainer = document.createElement("div");
+plyContainer.classList.add("hidden");
+
+for (let i = 1; i <= 8; i++) {
+  const sel = document.createElement("select");
+  sel.className = "ply";
+
+  plyOptions.forEach(p => {
+    sel.innerHTML += `<option data-price="${p.price}" data-weight="${p.weight}">${p.name}</option>`;
+  });
+
+  plyContainer.append(`Ply ${i}: `, sel, document.createElement("br"));
+}
+itemForm.append(plyContainer, document.createElement("br"));
+
+// Handle
+itemForm.append("Handle:", document.createElement("br"));
+const handleSelect = document.createElement("select");
+handleOptions.forEach(h => {
+  handleSelect.innerHTML += `<option data-price="${h.price}" data-weight="${h.weight}">${h.name} - $${h.price}</option>`;
+});
+itemForm.append(handleSelect);
+
+/***********************
+ * CALCULATE
+ ***********************/
+function calculate() {
+  let cost = SHIPPING_COST;
+  let weight = 0;
+  let summary = "";
+
+  summary += `<div class="summary-line">Blade Shape: ${bladeSelect.value}</div>`;
+
+  const buildType = document.querySelector('input[name="buildType"]:checked').value;
+
+  if (buildType === "model") {
+    const m = modelSelect.selectedOptions[0];
+    cost += Number(m.dataset.price);
+    summary += `<div class="summary-line">Model: ${m.textContent}</div>`;
+  } else {
+    document.querySelectorAll(".ply").forEach((p, i) => {
+      const opt = p.selectedOptions[0];
+      cost += Number(opt.dataset.price);
+      weight += Number(opt.dataset.weight);
+      if (!opt.textContent.startsWith("None")) {
+        summary += `<div class="summary-line">Ply ${i + 1}: ${opt.textContent}</div>`;
+      }
+    });
+  }
+
+  const h = handleSelect.selectedOptions[0];
+  cost += Number(h.dataset.price);
+  weight += Number(h.dataset.weight);
+
+  if (!h.textContent.startsWith("None")) {
+    summary += `<div class="summary-line">Handle: ${h.textContent}</div>`;
+  }
+
+  summary += `<div class="summary-line">Shipping: $${SHIPPING_COST.toFixed(2)}</div>`;
+
+  document.getElementById("itemTotalCost").textContent = `$${cost.toFixed(2)}`;
+  document.getElementById("itemTotalWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
+  document.getElementById("summaryContent").innerHTML = summary;
+  document.getElementById("summaryTotal").textContent = `$${cost.toFixed(2)}`;
+  document.getElementById("summaryWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
+}
+
+/***********************
+ * EVENTS
+ ***********************/
+itemForm.addEventListener("change", calculate);
+
+document.querySelectorAll('input[name="buildType"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    modelSelect.classList.toggle("hidden", radio.value !== "model");
+    modelLabel.classList.toggle("hidden", radio.value !== "model");
+    plyContainer.classList.toggle("hidden", radio.value !== "custom");
+    calculate();
+  });
+});
+
+calculate();
+
+/***********************
+ * SUBMIT ORDER
+ ***********************/
+orderForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  orderStatus.textContent = "Submitting order…";
+
+  const orderData = {
+    name: customerName.value,
+    email: customerEmail.value,
+    address: customerAddress.value,
+    totalCost: summaryTotal.textContent,
+    totalWeight: summaryWeight.textContent,
+    orderSummary: summaryContent.innerText,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData)
+    });
+
+    const text = await response.text();
+    if (!response.ok) throw new Error(text);
+
+    orderStatus.textContent = "✅ Order submitted successfully!";
+    orderForm.reset();
+    calculate();
+  } catch (err) {
+    console.error(err);
+    orderStatus.textContent = "❌ Error submitting order.";
+  }
+});
