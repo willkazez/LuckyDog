@@ -143,4 +143,60 @@ function calculate() {
   summary += `<div class="summary-line">Shipping: $${SHIPPING_COST.toFixed(2)}</div>`;
 
   document.getElementById("itemTotalCost").textContent = `$${cost.toFixed(2)}`;
-  document.getElementById("itemTotalWeight").textContent = wei
+  document.getElementById("itemTotalWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
+  summaryContent.innerHTML = summary;
+  summaryTotal.textContent = `$${cost.toFixed(2)}`;
+  summaryWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
+}
+
+/***********************
+ * EVENTS
+ ***********************/
+itemForm.addEventListener("change", calculate);
+
+document.querySelectorAll('input[name="buildType"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    modelSelect.classList.toggle("hidden", radio.value !== "model");
+    modelLabel.classList.toggle("hidden", radio.value !== "model");
+    plyContainer.classList.toggle("hidden", radio.value !== "custom");
+    calculate();
+  });
+});
+
+calculate();
+
+/***********************
+ * SUBMIT ORDER
+ ***********************/
+orderForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  orderStatus.textContent = "Submitting order…";
+
+  const orderData = {
+    name: customerName.value,
+    email: customerEmail.value,
+    address: customerAddress.value,
+    totalCost: summaryTotal.textContent,
+    totalWeight: summaryWeight.textContent,
+    orderSummary: summaryContent.innerText,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData)
+    });
+
+    const text = await response.text();
+    if (!response.ok) throw new Error(text);
+
+    orderStatus.textContent = "✅ Order submitted successfully!";
+    orderForm.reset();
+    calculate();
+  } catch (err) {
+    console.error(err);
+    orderStatus.textContent = "❌ Error submitting order.";
+  }
+});
