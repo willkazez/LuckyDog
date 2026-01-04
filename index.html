@@ -203,42 +203,42 @@ document.querySelectorAll('input[name="buildType"]').forEach(radio => {
 calculate();
 
 // ----------------- Submit Order -----------------
-document.addEventListener("DOMContentLoaded", () => {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbro6_Ir82fTVktfvIA2NEM4hfjgU-Ok9drCHWuolfIHQ3jxzZ2CTqVL1HDlN9zFwwbg/exec"; // <-- REPLACE with your deployed Web App URL
-  
-  const orderForm = document.getElementById("orderForm");
-  const status = document.getElementById("orderStatus");
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbro6_Ir82fTVktfvIA2NEM4hfjgU-Ok9drCHWuolfIHQ3jxzZ2CTqVL1HDlN9zFwwbg/exec";
 
-  orderForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    status.textContent = "Submitting order…";
+const orderForm = document.getElementById("orderForm");
+const status = document.getElementById("orderStatus");
 
-    const orderData = {
-      name: document.getElementById("customerName").value,
-      email: document.getElementById("customerEmail").value,
-      address: document.getElementById("customerAddress").value,
-      totalCost: document.getElementById("summaryTotal").textContent,
-      totalWeight: document.getElementById("summaryWeight").textContent,
-      orderSummary: document.getElementById("summaryContent").innerText,
-      timestamp: new Date().toISOString()
-    };
+orderForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  status.textContent = "Submitting order…";
 
-    try {
-      const response = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(orderData),
-        headers: { "Content-Type": "application/json" }
-      });
+  const orderData = {
+    name: customerName.value,
+    email: customerEmail.value,
+    address: customerAddress.value,
+    totalCost: summaryTotal.textContent,
+    totalWeight: summaryWeight.textContent,
+    orderSummary: summaryContent.innerText,
+    timestamp: new Date().toISOString()
+  };
 
-      if (!response.ok) throw new Error("Network error");
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData)
+    });
 
-      status.textContent = "✅ Order submitted successfully!";
-      orderForm.reset();
-    } catch (err) {
-      console.error(err);
-      status.textContent = "❌ Error submitting order.";
+    if (!response.ok) {
+      throw new Error(await response.text());
     }
-  });
+
+    status.textContent = "✅ Order submitted successfully!";
+    orderForm.reset();
+  } catch (err) {
+    console.error(err);
+    status.textContent = "❌ Error submitting order.";
+  }
 });
 </script>
 </body>
