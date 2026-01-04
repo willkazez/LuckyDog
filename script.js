@@ -127,11 +127,22 @@ function calculate() {
 // Events
 itemForm.addEventListener("change", calculate);
 
-// ----------------- Toggle Build Type -----------------
+// ----------------- Toggle Build Type with Debug -----------------
 function updateBuildType() {
-  const buildType = document.querySelector('input[name="buildType"]:checked').value;
-  modelSelect.classList.toggle("hidden", buildType !== "model");
-  plyContainer.classList.toggle("hidden", buildType !== "custom");
+  const buildTypeRadio = document.querySelector('input[name="buildType"]:checked');
+  if (!buildTypeRadio) {
+    console.warn("No radio button checked for buildType!");
+    return;
+  }
+
+  console.log("Selected build type:", buildTypeRadio.value);
+  console.log("Before toggle:", modelSelect, plyContainer);
+
+  modelSelect.classList.toggle("hidden", buildTypeRadio.value !== "model");
+  plyContainer.classList.toggle("hidden", buildTypeRadio.value !== "custom");
+
+  console.log("After toggle:", modelSelect.className, plyContainer.className);
+
   calculate();
 }
 
