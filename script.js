@@ -141,7 +141,7 @@ const orderForm = document.getElementById("orderForm");
 const status = document.getElementById("orderStatus");
 
 // Replace this URL with your current deployed Apps Script URL
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbro6_Ir82fTVktfvIA2NEM4hfjgU-Ok9drCHWuolfIHQ3jxzZ2CTqVL1HDlN9zFwwbg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
 
 orderForm.addEventListener("submit", async (e) => {
   e.preventDefault();
