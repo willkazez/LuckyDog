@@ -1,12 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Paddle Options and Pricing</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .container { display: flex; gap: 40px; align-items: flex-start; }
-    .form-section { flex: 1; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .form-section {
+      flex: 1;
+      min-width: 320px;
+    }
+
     .summary-panel {
       width: 300px;
       border: 1px solid #ccc;
@@ -15,57 +32,40 @@
       top: 20px;
       background: #f9f9f9;
     }
-    .summary-line { font-size: 14px; margin-bottom: 6px; }
-    .summary-total { font-weight: bold; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px; }
-    .hidden { display: none; }
-    label { display: block; margin-top: 10px; }
-    button { margin-top: 15px; padding: 8px 12px; font-size: 16px; }
+
+    .summary-line {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .summary-total {
+      font-weight: bold;
+      margin-top: 10px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 8px 12px;
+      font-size: 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
+
 <body>
 
 <h1>Paddle Options and Pricing</h1>
 
 <div class="container">
-  <!-- LEFT: Paddle Options -->
-  <div class="form-section">
-    <form id="itemForm"></form>
 
-    <p>Shipping within US: <strong>$10.00</strong></p>
-    <p>Total Cost: <span id="itemTotalCost">$0.00</span></p>
-    <p>Total Weight: <span id="itemTotalWeight">—</span></p>
-  </div>
-
-  <!-- RIGHT: Summary Panel -->
-  <div class="summary-panel">
-    <h3>Order Summary</h3>
-    <div id="summaryContent"></div>
-    <div class="summary-total">
-      Total: <span id="summaryTotal">$0.00</span><br>
-      Weight: <span id="summaryWeight">—</span>
-    </div>
-  </div>
-</div>
-
-<hr>
-
-<h2>Contact & Shipping Information</h2>
-<form id="orderForm">
-  <label>Full Name:<br>
-    <input type="text" id="customerName" required>
-  </label>
-  <label>Email Address:<br>
-    <input type="email" id="customerEmail" required>
-  </label>
-  <label>Shipping Address:<br>
-    <textarea id="customerAddress" rows="4" required></textarea>
-  </label>
-  <button type="submit">Submit Order</button>
-</form>
-<p id="orderStatus" style="font-weight:bold;"></p>
-
-<!-- Link to external JavaScript -->
-<script src="script.js"></script>
-
-</body>
-</html>
+  <!-- LEFT: O
