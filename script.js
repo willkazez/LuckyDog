@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
+
   /***********************
    * CONFIG
    ***********************/
   const SHIPPING_COST = 10;
-  const SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
 
   /***********************
    * DATA
@@ -45,45 +45,29 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   /***********************
-   * DOM ELEMENTS
-   ***********************/
-  const itemForm = document.getElementById("itemForm");
-  const orderForm = document.getElementById("orderForm");
-  const orderStatus = document.getElementById("orderStatus");
-  const summaryContent = document.getElementById("summaryContent");
-  const summaryTotal = document.getElementById("summaryTotal");
-  const summaryWeight = document.getElementById("summaryWeight");
-  const itemTotalCost = document.getElementById("itemTotalCost");
-  const itemTotalWeight = document.getElementById("itemTotalWeight");
-
-  /***********************
    * BUILD FORM
    ***********************/
+  const itemForm = document.getElementById("itemForm");
+
   // Blade Shape
-  itemForm.insertAdjacentHTML("beforeend", "<label>Blade Shape:</label>");
+  const bladeLabel = document.createElement("label");
+  bladeLabel.textContent = "Blade Shape:";
   const bladeSelect = document.createElement("select");
-  bladeShapes.forEach(b => {
-    bladeSelect.innerHTML += `<option data-price="${b.price}">${b.name}</option>`;
-  });
-  itemForm.append(bladeSelect, document.createElement("br"), document.createElement("br"));
+  bladeShapes.forEach(b => bladeSelect.innerHTML += `<option data-price="${b.price}">${b.name}</option>`);
+  itemForm.append(bladeLabel, bladeSelect, document.createElement("br"), document.createElement("br"));
 
   // Build Type
-  itemForm.insertAdjacentHTML(
-    "beforeend",
-    `
-<label><input type="radio" name="buildType" value="model" checked> Blade by Name</label>
-<label><input type="radio" name="buildType" value="custom"> Custom Ply Build</label>
-<br><br>
-`
-  );
+  itemForm.insertAdjacentHTML("beforeend", `
+    <label><input type="radio" name="buildType" value="model" checked> Blade by Name</label>
+    <label><input type="radio" name="buildType" value="custom"> Custom Ply Build</label>
+    <br><br>
+  `);
 
   // Blade Model
   const modelLabel = document.createElement("div");
   modelLabel.textContent = "Blade Model:";
   const modelSelect = document.createElement("select");
-  bladeModels.forEach(m => {
-    modelSelect.innerHTML += `<option data-price="${m.price}">${m.name} - $${m.price}</option>`;
-  });
+  bladeModels.forEach(m => modelSelect.innerHTML += `<option data-price="${m.price}">${m.name} - $${m.price}</option>`);
   itemForm.append(modelLabel, modelSelect, document.createElement("br"), document.createElement("br"));
 
   // Ply Container
@@ -92,20 +76,17 @@ document.addEventListener("DOMContentLoaded", () => {
   for (let i = 1; i <= 8; i++) {
     const sel = document.createElement("select");
     sel.className = "ply";
-    plyOptions.forEach(p => {
-      sel.innerHTML += `<option data-price="${p.price}" data-weight="${p.weight}">${p.name}</option>`;
-    });
+    plyOptions.forEach(p => sel.innerHTML += `<option data-price="${p.price}" data-weight="${p.weight}">${p.name}</option>`);
     plyContainer.append(`Ply ${i}: `, sel, document.createElement("br"));
   }
   itemForm.append(plyContainer, document.createElement("br"));
 
   // Handle
-  itemForm.append("Handle:", document.createElement("br"));
+  const handleLabel = document.createElement("div");
+  handleLabel.textContent = "Handle:";
   const handleSelect = document.createElement("select");
-  handleOptions.forEach(h => {
-    handleSelect.innerHTML += `<option data-price="${h.price}" data-weight="${h.weight}">${h.name} - $${h.price}</option>`;
-  });
-  itemForm.append(handleSelect);
+  handleOptions.forEach(h => handleSelect.innerHTML += `<option data-price="${h.price}" data-weight="${h.weight}">${h.name} - $${h.price}</option>`);
+  itemForm.append(handleLabel, handleSelect);
 
   /***********************
    * CALCULATE
@@ -116,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let summary = "";
 
     summary += `<div class="summary-line">Blade Shape: ${bladeSelect.value}</div>`;
-
     const buildType = document.querySelector('input[name="buildType"]:checked').value;
 
     if (buildType === "model") {
@@ -128,27 +108,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const opt = p.selectedOptions[0];
         cost += Number(opt.dataset.price);
         weight += Number(opt.dataset.weight);
-        if (!opt.textContent.startsWith("None")) {
-          summary += `<div class="summary-line">Ply ${i + 1}: ${opt.textContent}</div>`;
-        }
+        if (!opt.textContent.startsWith("None")) summary += `<div class="summary-line">Ply ${i+1}: ${opt.textContent}</div>`;
       });
     }
 
     const h = handleSelect.selectedOptions[0];
     cost += Number(h.dataset.price);
     weight += Number(h.dataset.weight);
-
-    if (!h.textContent.startsWith("None")) {
-      summary += `<div class="summary-line">Handle: ${h.textContent}</div>`;
-    }
-
+    if (!h.textContent.startsWith("None")) summary += `<div class="summary-line">Handle: ${h.textContent}</div>`;
     summary += `<div class="summary-line">Shipping: $${SHIPPING_COST.toFixed(2)}</div>`;
 
-    itemTotalCost.textContent = `$${cost.toFixed(2)}`;
-    itemTotalWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
-    summaryContent.innerHTML = summary;
-    summaryTotal.textContent = `$${cost.toFixed(2)}`;
-    summaryWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
+    document.getElementById("itemTotalCost").textContent = `$${cost.toFixed(2)}`;
+    document.getElementById("itemTotalWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
+    document.getElementById("summaryContent").innerHTML = summary;
+    document.getElementById("summaryTotal").textContent = `$${cost.toFixed(2)}`;
+    document.getElementById("summaryWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
   }
 
   /***********************
@@ -170,17 +144,20 @@ document.addEventListener("DOMContentLoaded", () => {
   /***********************
    * SUBMIT ORDER
    ***********************/
-  orderForm.addEventListener("submit", async (e) => {
+  const orderForm = document.getElementById("orderForm");
+  const orderStatus = document.getElementById("orderStatus");
+
+  orderForm.addEventListener("submit", async e => {
     e.preventDefault();
     orderStatus.textContent = "Submitting order…";
 
     const orderData = {
-      name: customerName.value,
-      email: customerEmail.value,
-      address: customerAddress.value,
-      totalCost: summaryTotal.textContent,
-      totalWeight: summaryWeight.textContent,
-      orderSummary: summaryContent.innerText,
+      name: document.getElementById("customerName").value,
+      email: document.getElementById("customerEmail").value,
+      address: document.getElementById("customerAddress").value,
+      totalCost: document.getElementById("summaryTotal").textContent,
+      totalWeight: document.getElementById("summaryWeight").textContent,
+      orderSummary: document.getElementById("summaryContent").innerText,
       timestamp: new Date().toISOString()
     };
 
