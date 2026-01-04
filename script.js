@@ -2,8 +2,7 @@
  * CONFIG
  ********************/
 const SHIPPING_COST = 10;
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
-
+const SCRIPT_URL = "https://script.google.com/home/projects/1mwRpNM60t4WiFAfVY3d6Xl54uilsmc_K1-XfT-7KsQAAGamSxdbCiFoK/edit";
 /********************
  * DATA
  ********************/
