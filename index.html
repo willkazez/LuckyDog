@@ -1,70 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Paddle Options and Pricing</title>
+  <title>Place an Order</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
-    .container { display: flex; gap: 40px; align-items: flex-start; }
-    .form-section { flex: 1; }
-    .summary-panel {
-      width: 300px;
-      border: 1px solid #ccc;
-      padding: 15px;
-      position: sticky;
-      top: 20px;
-      background: #f9f9f9;
-    }
-    .summary-line { font-size: 14px; margin-bottom: 6px; }
-    .summary-total { font-weight: bold; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px; }
-    .hidden { display: none; }
     label { display: block; margin-top: 10px; }
-    button { margin-top: 15px; padding: 8px 12px; font-size: 16px; }
+    input, select { margin-top: 5px; padding: 5px; width: 250px; }
+    button { margin-top: 15px; padding: 10px 20px; }
+    #message { margin-top: 15px; font-weight: bold; }
   </style>
 </head>
 <body>
+  <h1>Place an Order</h1>
 
-<h1>Paddle Options and Pricing</h1>
+  <form id="orderForm">
+    <label>
+      Name:
+      <input type="text" name="name" required>
+    </label>
+    <label>
+      Item:
+      <select name="item" required>
+        <option value="Greyhound">Greyhound - $127</option>
+        <option value="Greyhound Z">Greyhound Z - $137</option>
+        <option value="Whippet">Whippet - $127</option>
+        <option value="Goldendoodle">Goldendoodle - $89</option>
+        <option value="Goldendoodle Z">Goldendoodle Z - $95</option>
+      </select>
+    </label>
+    <label>
+      Price:
+      <input type="number" name="price" required>
+    </label>
+    <button type="submit">Submit Order</button>
+  </form>
 
-<div class="container">
-  <!-- LEFT: Paddle Options -->
-  <div class="form-section">
-    <form id="itemForm"></form>
+  <div id="message"></div>
 
-    <p>Shipping within US: <strong>$10.00</strong></p>
-    <p>Total Cost: <span id="itemTotalCost">$0.00</span></p>
-    <p>Total Weight: <span id="itemTotalWeight">—</span></p>
-  </div>
+  <script>
+    const form = document.getElementById('orderForm');
+    const messageDiv = document.getElementById('message');
 
-  <!-- RIGHT: Summary Panel -->
-  <div class="summary-panel">
-    <h3>Order Summary</h3>
-    <div id="summaryContent"></div>
-    <div class="summary-total">
-      Total: <span id="summaryTotal">$0.00</span><br>
-      Weight: <span id="summaryWeight">—</span>
-    </div>
-  </div>
-</div>
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.textContent = "Submitting...";
 
-<hr>
-<h2>Contact & Shipping Information</h2>
-<form id="orderForm">
-  <label>Full Name:<br>
-    <input type="text" id="customerName" required>
-  </label>
-  <label>Email Address:<br>
-    <input type="email" id="customerEmail" required>
-  </label>
-  <label>Shipping Address:<br>
-    <textarea id="customerAddress" rows="4" required></textarea>
-  </label>
-  <button type="submit">Submit Order</button>
-</form>
-<p id="orderStatus" style="font-weight:bold;"></p>
+      const formData = new FormData(form);
+      const data = {
+        name: formData.get('name'),
+        item: formData.get('item'),
+        price: Number(formData.get('price'))
+      };
 
-<!-- Link to script.js -->
-<script src="script.js"></script>
+      try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbyPJUjvI49hxPbvbaxR-AivVN9l5SDamL20GXY1Rmvoc9sgMDWMbtBqd4rZ0oKhQ7EI/exec', {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'application/json' }
+        });
 
+        const result = await response.json();
+
+        if(result.status === "success") {
+          messageDiv.textContent = "Order submitted successfully!";
+          form.reset();
+        } else {
+          messageDiv.textContent = "Error: " + result.message;
+        }
+      } catch (err) {
+        messageDiv.textContent = "Submission failed: " + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
