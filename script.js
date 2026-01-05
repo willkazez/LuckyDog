@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   const SHIPPING_COST = 10;
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
+
+  // ✅ Make sure this EXACTLY matches your deployed Apps Script URL
+  const SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbx8H2C9f908OXLnryLQjiIKoWYQ_oXfhsRmIkpFR8puPekq7CoK8A1jhEgeBn1MkZWF/exec";
 
   const bladeModels = [
     { name: "Greyhound", price: 127 },
@@ -136,10 +139,13 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await fetch(SCRIPT_URL, {
         method: "POST",
+        mode: "no-cors",   // ⭐ THIS is the critical line
         body: JSON.stringify(payload)
       });
 
-      orderStatus.textContent = "✅ Order received! We’ll contact you shortly.";
+      orderStatus.textContent =
+        "✅ Order received! We’ll contact you shortly.";
+
       orderForm.reset();
       calculate();
 
