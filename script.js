@@ -1,10 +1,10 @@
-    document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
   const SHIPPING_COST = 10;
 
-  // 🔴 MUST be your currently deployed Apps Script Web App URL
+  // 🔴 Your deployed Apps Script Web App URL
   const SCRIPT_URL =
-   "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
+    "https://script.google.com/macros/s/AKfycbx8H2C9f908OXLnryLQjiIKoWYQ_oXfhsRmIkpFR8puPekq7CoK8A1jhEgeBn1MkZWF/exec";
 
   const bladeModels = [
     { name: "Greyhound", price: 127 },
@@ -122,9 +122,14 @@
 
   calculate();
 
-  // ✅ FIRE-AND-FORGET SUBMIT (no false failures)
+  // ✅ SUBMIT ORDER (with spam honeypot)
   orderForm.addEventListener("submit", e => {
     e.preventDefault();
+
+    // 🛡️ Honeypot spam check
+    if (document.getElementById("company")?.value !== "") {
+      return;
+    }
 
     orderStatus.textContent = "Submitting order…";
 
@@ -154,4 +159,3 @@
     calculate();
   });
 });
-
