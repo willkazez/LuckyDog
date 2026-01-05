@@ -4,8 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ✅ Make sure this EXACTLY matches your deployed Apps Script URL
   const SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbx8H2C9f908OXLnryLQjiIKoWYQ_oXfhsRmIkpFR8puPekq7CoK8A1jhEgeBn1MkZWF/exec";
+    "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
 
+  
   const bladeModels = [
     { name: "Greyhound", price: 127 },
     { name: "Greyhound Z", price: 137 },
