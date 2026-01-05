@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
    * CONFIG
    ***********************/
   const SHIPPING_COST = 10;
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwznCnIJXPfeA7_7eKZSGz3aHWLjXS8x_Hb2_mgPWlBxgHJiivCgssgolg9Xqw7vmE5EA/exec";
-  
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJ5kyQVVGCLp1MrCNKjfUepfBHOMP2RGlDAbBi6Kfw2Acba_X0K9XJL9_78cQVS08Lvg/exec";
+
   /***********************
    * DATA
    ***********************/
