@@ -3,8 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const SHIPPING_COST = 10;
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8H2C9f908OXLnryLQjiIKoWYQ_oXfhsRmIkpFR8puPekq7CoK8A1jhEgeBn1MkZWF/exec";
 
-  const bladeShapes = ["Traditional", "Cyber"];
-
   const bladeModels = [
     { name: "Greyhound", price: 127 },
     { name: "Greyhound Z", price: 137 },
@@ -38,23 +36,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const itemForm = document.getElementById("itemForm");
 
   itemForm.innerHTML = `
-    <label>Blade Shape:
-      <select id="bladeShape">
-        ${bladeShapes.map(b => `<option>${b}</option>`).join("")}
+    <label>Build Type:
+      <select id="buildType">
+        <option value="model">Blade by Name</option>
+        <option value="custom">Custom Ply Build</option>
       </select>
-    </label>
-
-    <label>
-      <input type="radio" name="buildType" value="model" checked> Blade by Name
-    </label>
-    <label>
-      <input type="radio" name="buildType" value="custom"> Custom Ply Build
     </label>
 
     <div id="modelBlock">
       <label>Blade Model:
         <select id="bladeModel">
-          ${bladeModels.map(m => `<option data-price="${m.price}">${m.name} - $${m.price}</option>`).join("")}
+          ${bladeModels.map(m =>
+            `<option data-price="${m.price}">${m.name} - $${m.price}</option>`
+          ).join("")}
         </select>
       </label>
     </div>
@@ -64,7 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>Ply ${i + 1}:
           <select class="ply">
             ${plyOptions.map(p =>
-              `<option data-price="${p.price}" data-weight="${p.weight}">${p.name}</option>`
+              `<option data-price="${p.price}" data-weight="${p.weight}">
+                ${p.name}
+              </option>`
             ).join("")}
           </select>
         </label>
@@ -87,10 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let weight = 0;
     let summary = "";
 
-    const buildType = document.querySelector('input[name="buildType"]:checked').value;
-
-    if (buildType === "model") {
-      const m = document.getElementById("bladeModel").selectedOptions[0];
+    if (buildType.value === "model") {
+      const m = bladeModel.selectedOptions[0];
       cost += Number(m.dataset.price);
       summary += `<div class="summary-line">Model: ${m.textContent}</div>`;
     } else {
@@ -104,31 +98,31 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    const handle = document.getElementById("handle").selectedOptions[0];
-    cost += Number(handle.dataset.price);
-    weight += Number(handle.dataset.weight);
+    const h = handle.selectedOptions[0];
+    cost += Number(h.dataset.price);
+    weight += Number(h.dataset.weight);
 
     summary += `<div class="summary-line">Shipping: $${SHIPPING_COST}</div>`;
 
-    document.getElementById("itemTotalCost").textContent = `$${cost.toFixed(2)}`;
-    document.getElementById("itemTotalWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
-    document.getElementById("summaryContent").innerHTML = summary;
-    document.getElementById("summaryTotal").textContent = `$${cost.toFixed(2)}`;
-    document.getElementById("summaryWeight").textContent = weight ? `${weight.toFixed(1)}g` : "—";
+    itemTotalCost.textContent = `$${cost.toFixed(2)}`;
+    itemTotalWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
+    summaryContent.innerHTML = summary;
+    summaryTotal.textContent = `$${cost.toFixed(2)}`;
+    summaryWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
   }
 
-  document.addEventListener("change", e => {
-    if (e.target.name === "buildType") {
-      document.getElementById("modelBlock").classList.toggle("hidden", e.target.value !== "model");
-      document.getElementById("plyBlock").classList.toggle("hidden", e.target.value !== "custom");
-    }
+  itemForm.addEventListener("change", () => {
+    modelBlock.classList.toggle("hidden", buildType.value !== "model");
+    plyBlock.classList.toggle("hidden", buildType.value !== "custom");
     calculate();
   });
 
   calculate();
 
-  document.getElementById("orderForm").addEventListener("submit", async e => {
+  orderForm.addEventListener("submit", async e => {
     e.preventDefault();
+
+    orderStatus.textContent = "Submitting order…";
 
     const payload = {
       name: customerName.value,
@@ -139,19 +133,18 @@ document.addEventListener("DOMContentLoaded", () => {
       summary: summaryContent.innerText
     };
 
-    orderStatus.textContent = "Submitting order…";
-
     try {
-      const res = await fetch(SCRIPT_URL, {
+      await fetch(SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error("Network error");
-      orderStatus.textContent = "✅ Order submitted successfully!";
-      e.target.reset();
+      orderStatus.textContent = "✅ Order received! We’ll contact you shortly.";
+      orderForm.reset();
       calculate();
-    } catch {
+
+    } catch (err) {
+      console.error(err);
       orderStatus.textContent = "❌ Order submission failed.";
     }
   });
