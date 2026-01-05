@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   const SHIPPING_COST = 10;
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz28h_JX7H8v27Ai9qWxpB1sP7TaTlIDAR8TLZMNIe7kUQYPZBm4cnVANQDwWWFNnkb/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8H2C9f908OXLnryLQjiIKoWYQ_oXfhsRmIkpFR8puPekq7CoK8A1jhEgeBn1MkZWF/exec";
 
   const bladeShapes = ["Traditional", "Cyber"];
 
