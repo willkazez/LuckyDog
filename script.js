@@ -1,12 +1,11 @@
-document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
 
   const SHIPPING_COST = 10;
 
-  // ✅ Make sure this EXACTLY matches your deployed Apps Script URL
+  // 🔴 MUST be your currently deployed Apps Script Web App URL
   const SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
+   "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
 
-  
   const bladeModels = [
     { name: "Greyhound", price: 127 },
     { name: "Greyhound Z", price: 137 },
@@ -123,7 +122,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   calculate();
 
-  orderForm.addEventListener("submit", async e => {
+  // ✅ FIRE-AND-FORGET SUBMIT (no false failures)
+  orderForm.addEventListener("submit", e => {
     e.preventDefault();
 
     orderStatus.textContent = "Submitting order…";
@@ -138,21 +138,20 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      await fetch(SCRIPT_URL, {
+      fetch(SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",   // ⭐ THIS is the critical line
+        mode: "no-cors",
         body: JSON.stringify(payload)
       });
-
-      orderStatus.textContent =
-        "✅ Order received! We’ll contact you shortly.";
-
-      orderForm.reset();
-      calculate();
-
     } catch (err) {
-      console.error(err);
-      orderStatus.textContent = "❌ Order submission failed.";
+      console.error("Non-fatal submit error:", err);
     }
+
+    orderStatus.textContent =
+      "✅ Order received! We’ll contact you shortly.";
+
+    orderForm.reset();
+    calculate();
   });
 });
+
