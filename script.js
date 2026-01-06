@@ -1,10 +1,10 @@
-    document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
   const SHIPPING_COST = 10;
 
   // 🔴 MUST be your currently deployed Apps Script Web App URL
   const SCRIPT_URL =
-   "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
+    "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
 
   const bladeModels = [
     { name: "Greyhound", price: 127 },
@@ -14,13 +14,18 @@
     { name: "Goldendoodle Z", price: 95 }
   ];
 
-  const handleOptions = [
+  const handleWoodOptions = [
     { name: "None", weight: 0, price: 0 },
     { name: "Kiri", weight: 11, price: 16 },
     { name: "Walnut", weight: 23, price: 17 },
     { name: "Kassod", weight: 27, price: 16 },
     { name: "Redwood", weight: 33, price: 16 },
     { name: "Rosewood", weight: 38, price: 20 }
+  ];
+
+  const handleShapeOptions = [
+    { name: "Straight", weight: 0, price: 0 },
+    { name: "Flared", weight: 0, price: 0 }
   ];
 
   const plyOptions = [
@@ -70,11 +75,21 @@
       `).join("")}
     </div>
 
-    <label>Handle:
-      <select id="handle">
-        ${handleOptions.map(h =>
+    <label>Handle wood:
+      <select id="handleWood">
+        ${handleWoodOptions.map(h =>
           `<option data-price="${h.price}" data-weight="${h.weight}">
             ${h.name} (${h.weight}g) - $${h.price}
+          </option>`
+        ).join("")}
+      </select>
+    </label>
+
+    <label>Handle shape:
+      <select id="handleShape">
+        ${handleShapeOptions.map(s =>
+          `<option data-price="${s.price}" data-weight="${s.weight}">
+            ${s.name}
           </option>`
         ).join("")}
       </select>
@@ -101,9 +116,13 @@
       });
     }
 
-    const h = handle.selectedOptions[0];
-    cost += Number(h.dataset.price);
-    weight += Number(h.dataset.weight);
+    const hw = handleWood.selectedOptions[0];
+    cost += Number(hw.dataset.price);
+    weight += Number(hw.dataset.weight);
+    summary += `<div class="summary-line">Handle wood: ${hw.textContent}</div>`;
+
+    const hs = handleShape.selectedOptions[0];
+    summary += `<div class="summary-line">Handle shape: ${hs.textContent}</div>`;
 
     summary += `<div class="summary-line">Shipping: $${SHIPPING_COST}</div>`;
 
@@ -122,7 +141,7 @@
 
   calculate();
 
-  // ✅ FIRE-AND-FORGET SUBMIT (no false failures)
+  // ✅ FIRE-AND-FORGET SUBMIT (unchanged & proven)
   orderForm.addEventListener("submit", e => {
     e.preventDefault();
 
@@ -154,4 +173,3 @@
     calculate();
   });
 });
-
