@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const SHIPPING_COST = 10;
 
-  // 🔴 MUST be your currently deployed Apps Script Web App URL
   const SCRIPT_URL =
     "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
 
@@ -12,6 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Whippet", price: 127 },
     { name: "Goldendoodle", price: 89 },
     { name: "Goldendoodle Z", price: 95 }
+  ];
+
+  const bladeShapeOptions = [
+    { name: "Traditional", weight: 0, price: 0 },
+    { name: "Cyber", weight: 0, price: 0 }
   ];
 
   const handleWoodOptions = [
@@ -59,6 +63,16 @@ document.addEventListener("DOMContentLoaded", () => {
           ).join("")}
         </select>
       </label>
+
+      <label>Blade Shape:
+        <select id="bladeShape">
+          ${bladeShapeOptions.map(s =>
+            `<option data-price="${s.price}" data-weight="${s.weight}">
+              ${s.name}
+            </option>`
+          ).join("")}
+        </select>
+      </label>
     </div>
 
     <div id="plyBlock" class="hidden">
@@ -75,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `).join("")}
     </div>
 
-    <label>Handle wood:
+    <label>Handle Wood:
       <select id="handleWood">
         ${handleWoodOptions.map(h =>
           `<option data-price="${h.price}" data-weight="${h.weight}">
@@ -85,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </select>
     </label>
 
-    <label>Handle shape:
+    <label>Handle Shape:
       <select id="handleShape">
         ${handleShapeOptions.map(s =>
           `<option data-price="${s.price}" data-weight="${s.weight}">
@@ -116,6 +130,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    const bs = bladeShape.selectedOptions[0];
+    summary += `<div class="summary-line">Blade shape: ${bs.textContent}</div>`;
+
     const hw = handleWood.selectedOptions[0];
     cost += Number(hw.dataset.price);
     weight += Number(hw.dataset.weight);
@@ -141,30 +158,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   calculate();
 
-  // ✅ FIRE-AND-FORGET SUBMIT (unchanged & proven)
   orderForm.addEventListener("submit", e => {
     e.preventDefault();
 
     orderStatus.textContent = "Submitting order…";
 
-    const payload = {
-      name: customerName.value,
-      email: customerEmail.value,
-      address: customerAddress.value,
-      totalCost: summaryTotal.textContent,
-      totalWeight: summaryWeight.textContent,
-      summary: summaryContent.innerText
-    };
-
-    try {
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(payload)
-      });
-    } catch (err) {
-      console.error("Non-fatal submit error:", err);
-    }
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify({
+        name: customerName.value,
+        email: customerEmail.value,
+        address: customerAddress.value,
+        totalCost: summaryTotal.textContent,
+        totalWeight: summaryWeight.textContent,
+        summary: summaryContent.innerText
+      })
+    });
 
     orderStatus.textContent =
       "✅ Order received! We’ll contact you shortly.";
