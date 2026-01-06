@@ -6,11 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
     "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
 
   const bladeModels = [
-    { name: "Greyhound", price: 127 },
-    { name: "Greyhound Z", price: 137 },
-    { name: "Whippet", price: 127 },
-    { name: "Goldendoodle", price: 89 },
-    { name: "Goldendoodle Z", price: 95 }
+    { name: "Greyhound", weight: 69, price: 127 },
+    { name: "Greyhound Z", weight: 72, price: 137 },
+    { name: "Whippet", weight: 71, price: 127 },
+    { name: "Goldendoodle", weight: 73, price: 89 },
+    { name: "Goldendoodle Z", weight: 76, price: 95 }
   ];
 
   const bladeShapeOptions = [
