@@ -59,13 +59,14 @@ document.addEventListener("DOMContentLoaded", () => {
       <label>Blade Model:
         <select id="bladeModel">
           ${bladeModels.map(m =>
-            `<option data-price="${m.price}">${m.name} - $${m.price}</option>`
+            `<option data-price="${m.price}" data-weight="${m.weight}">
+              ${m.name} (${m.weight}g) - $${m.price}
+            </option>`
           ).join("")}
         </select>
       </label>
     </div>
 
-    <!-- Blade Shape is ALWAYS visible -->
     <label>Blade Shape:
       <select id="bladeShape">
         ${bladeShapeOptions.map(s =>
@@ -119,12 +120,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (buildType.value === "model") {
       const m = bladeModel.selectedOptions[0];
       cost += Number(m.dataset.price);
+      weight += Number(m.dataset.weight);
+
       summary += `<div class="summary-line">Model: ${m.textContent}</div>`;
     } else {
       document.querySelectorAll(".ply").forEach((p, i) => {
         const opt = p.selectedOptions[0];
         cost += Number(opt.dataset.price);
         weight += Number(opt.dataset.weight);
+
         if (opt.textContent !== "None") {
           summary += `<div class="summary-line">Ply ${i + 1}: ${opt.textContent}</div>`;
         }
@@ -145,10 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
     summary += `<div class="summary-line">Shipping: $${SHIPPING_COST}</div>`;
 
     itemTotalCost.textContent = `$${cost.toFixed(2)}`;
-    itemTotalWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
+    itemTotalWeight.textContent = `${weight.toFixed(1)}g`;
+
     summaryContent.innerHTML = summary;
     summaryTotal.textContent = `$${cost.toFixed(2)}`;
-    summaryWeight.textContent = weight ? `${weight.toFixed(1)}g` : "—";
+    summaryWeight.textContent = `${weight.toFixed(1)}g`;
   }
 
   itemForm.addEventListener("change", () => {
