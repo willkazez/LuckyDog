@@ -1,22 +1,10 @@
-document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
 
   const SHIPPING_COST = 10;
+
+  // 🔴 MUST be your currently deployed Apps Script Web App URL
   const SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
-
-  // 🔗 Explicit DOM bindings (CRITICAL)
-  const itemForm = document.getElementById("itemForm");
-  const itemTotalCost = document.getElementById("itemTotalCost");
-  const itemTotalWeight = document.getElementById("itemTotalWeight");
-  const summaryContent = document.getElementById("summaryContent");
-  const summaryTotal = document.getElementById("summaryTotal");
-  const summaryWeight = document.getElementById("summaryWeight");
-
-  const orderForm = document.getElementById("orderForm");
-  const orderStatus = document.getElementById("orderStatus");
-  const customerName = document.getElementById("customerName");
-  const customerEmail = document.getElementById("customerEmail");
-  const customerAddress = document.getElementById("customerAddress");
+   "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
 
   const bladeModels = [
     { name: "Greyhound", price: 127 },
@@ -48,14 +36,15 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "ZLC", weight: 7.56, price: 42 }
   ];
 
-  // 🔧 Build item form
+  const itemForm = document.getElementById("itemForm");
+
   itemForm.innerHTML = `
     <label>Build Type:
       <select id="buildType">
         <option value="model">Blade by Name</option>
         <option value="custom">Custom Ply Build</option>
       </select>
-    </label><br><br>
+    </label>
 
     <div id="modelBlock">
       <label>Blade Model:
@@ -65,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ).join("")}
         </select>
       </label>
-    </div><br>
+    </div>
 
     <div id="plyBlock" class="hidden">
       ${Array.from({ length: 8 }, (_, i) => `
@@ -77,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
               </option>`
             ).join("")}
           </select>
-        </label><br>
+        </label>
       `).join("")}
     </div>
 
@@ -91,12 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </select>
     </label>
   `;
-
-  const buildType = document.getElementById("buildType");
-  const bladeModel = document.getElementById("bladeModel");
-  const handle = document.getElementById("handle");
-  const modelBlock = document.getElementById("modelBlock");
-  const plyBlock = document.getElementById("plyBlock");
 
   function calculate() {
     let cost = SHIPPING_COST;
@@ -139,27 +122,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   calculate();
 
-  // ✅ Order submit (works)
+  // ✅ FIRE-AND-FORGET SUBMIT (no false failures)
   orderForm.addEventListener("submit", e => {
     e.preventDefault();
 
-    // honeypot
-    if (document.getElementById("company")?.value !== "") return;
-
     orderStatus.textContent = "Submitting order…";
 
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify({
-        name: customerName.value,
-        email: customerEmail.value,
-        address: customerAddress.value,
-        totalCost: summaryTotal.textContent,
-        totalWeight: summaryWeight.textContent,
-        summary: summaryContent.innerText
-      })
-    });
+    const payload = {
+      name: customerName.value,
+      email: customerEmail.value,
+      address: customerAddress.value,
+      totalCost: summaryTotal.textContent,
+      totalWeight: summaryWeight.textContent,
+      summary: summaryContent.innerText
+    };
+
+    try {
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+      });
+    } catch (err) {
+      console.error("Non-fatal submit error:", err);
+    }
 
     orderStatus.textContent =
       "✅ Order received! We’ll contact you shortly.";
@@ -168,3 +154,4 @@ document.addEventListener("DOMContentLoaded", () => {
     calculate();
   });
 });
+
