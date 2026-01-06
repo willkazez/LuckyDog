@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const SHIPPING_COST = 10;
 
   const SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbwMDSaq_sckZsbiZCawSSovbU7zr9S9QfGhzYPWEj7b-3-awsbvtaFA1HxoT3EhSoqS/exec";
+    "https://script.google.com/macros/s/AKfycbwJ5Rt_tqxkUkJWwZIXcpNijv8g8B4OUSRtXK6hsDmzU_e0x19HS2uYfDghu7FPB4h-/exec";
 
   const bladeModels = [
     { name: "Greyhound", weight: 69, price: 127 },
