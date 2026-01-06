@@ -63,17 +63,18 @@ document.addEventListener("DOMContentLoaded", () => {
           ).join("")}
         </select>
       </label>
-
-      <label>Blade Shape:
-        <select id="bladeShape">
-          ${bladeShapeOptions.map(s =>
-            `<option data-price="${s.price}" data-weight="${s.weight}">
-              ${s.name}
-            </option>`
-          ).join("")}
-        </select>
-      </label>
     </div>
+
+    <!-- Blade Shape is ALWAYS visible -->
+    <label>Blade Shape:
+      <select id="bladeShape">
+        ${bladeShapeOptions.map(s =>
+          `<option data-price="${s.price}" data-weight="${s.weight}">
+            ${s.name}
+          </option>`
+        ).join("")}
+      </select>
+    </label>
 
     <div id="plyBlock" class="hidden">
       ${Array.from({ length: 8 }, (_, i) => `
