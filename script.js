@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Ayous core (3mm)", weight: 30.6, price: 12 },
     { name: "Kiri core (3mm)", weight: 24.0, price: 12 },
     { name: "Super ALC", weight: 6.0, price: 37 },
-    { name: "ZLC", weight: 7.56, price: 42 }
+    { name: "Super ZLC", weight: 7.56, price: 42 } // ← renamed
   ];
 
   const itemForm = document.getElementById("itemForm");
@@ -121,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const m = bladeModel.selectedOptions[0];
       cost += Number(m.dataset.price);
       weight += Number(m.dataset.weight);
-
       summary += `<div class="summary-line">Model: ${m.textContent}</div>`;
     } else {
       document.querySelectorAll(".ply").forEach((p, i) => {
@@ -182,8 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     });
 
-    orderStatus.textContent =
-      "✅ Order received! We’ll contact you shortly.";
+    orderStatus.textContent = "✅ Order received! We’ll contact you shortly.";
 
     orderForm.reset();
     calculate();
