@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Ayous core (3mm)", weight: 30.6, price: 12 },
     { name: "Kiri core (3mm)", weight: 24.0, price: 12 },
     { name: "Super ALC", weight: 6.0, price: 37 },
-    { name: “Super ZLC", weight: 7.56, price: 42 }
+    { name: "ZLC", weight: 7.56, price: 42 }
   ];
 
   const itemForm = document.getElementById("itemForm");
