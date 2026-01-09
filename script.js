@@ -13,9 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Goldendoodle Z", weight: 76, price: 95 }
   ];
 
+  // ✅ UPDATED: Added "Bigger" at no cost / no weight
   const bladeShapeOptions = [
     { name: "Traditional", weight: 0, price: 0 },
-    { name: "Cyber", weight: 0, price: 0 }
+    { name: "Cyber", weight: 0, price: 0 },
+    { name: "Bigger", weight: 0, price: 0 }
   ];
 
   const handleWoodOptions = [
@@ -42,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Ayous core (3mm)", weight: 30.6, price: 12 },
     { name: "Kiri core (3mm)", weight: 24.0, price: 12 },
     { name: "Super ALC", weight: 6.0, price: 37 },
-    { name: "Super ZLC", weight: 7.56, price: 42 } // ← renamed
+    { name: "Super ZLC", weight: 7.56, price: 42 }
   ];
 
   const itemForm = document.getElementById("itemForm");
